@@ -83,9 +83,67 @@ def increment_version(type='patch'):
 		new_version[-1] += 1	
             
 	set_version(tuple(new_version))
-	print("Version updated from:", current_version)
-	print(" to version: ", tuple(new_version))	
+	print("Version updated from: {tuple(current_version)}, to version: {tuple(new_version)}")
 	  
+
+
+def git_add():
+    try:
+        result = subprocess.run(["git", "add", "."], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+        if result.returncode == 0:
+            print("Git add successful")
+            print(result.stdout)
+        else:
+            print("Git add failed")
+            print(result.stderr)
+    except Exception as e:
+        print(f"Error during git add: {e}")
+
+def git_commit(message): 
+    try:
+        result = subprocess.run(["git", "commit", "-m", message], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+        if result.returncode == 0:
+            print("Git commit successful")
+            print(result.stdout)
+        else:
+            print("Git commit failed")
+            print(result.stderr)
+    except Exception as e:
+        print(f"Error during git commit: {e}")
+
+def git_fetch():
+    """
+    Wykonuje git fetch.
+    """
+    try:
+        result = subprocess.run(["git", "fetch"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+        if result.returncode == 0:
+            print("Git fetch successful")
+            print(result.stdout)
+        else:
+            print("Git fetch failed")
+            print(result.stderr)
+    except Exception as e:
+        print(f"Error during git fetch: {e}")
+
+def write_version_hpp():
+    """
+    Zapisuje wersję do pliku include/version.hpp jako stałe C++.
+    """
+    version = get_version()
+    hpp_content = f"""#ifndef VERSION_HPP
+#define VERSION_HPP
+
+#define VERSION_MAJOR {version[0]}
+#define VERSION_MINOR {version[1]}
+#define VERSION_PATCH {version[2]}
+
+#endif // VERSION_HPP
+"""
+    hpp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "include", "version.hpp")
+    with open(hpp_path, "w") as hpp_file:
+        hpp_file.write(hpp_content)
+    print(f"Version written to {hpp_path}")
 
 def git_push():    
     try:
@@ -99,35 +157,6 @@ def git_push():
     except Exception as e:
         print(f"Error during git push: {e}")
 
-def git_add():
-    """
-    Wykonuje git add . (dodaje wszystkie pliki).
-    """
-    try:
-        result = subprocess.run(["git", "add", "."], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
-        if result.returncode == 0:
-            print("Git add successful")
-            print(result.stdout)
-        else:
-            print("Git add failed")
-            print(result.stderr)
-    except Exception as e:
-        print(f"Error during git add: {e}")
-
-def git_commit(message):
-    """
-    Wykonuje git commit z podaną wiadomością.
-    """
-    try:
-        result = subprocess.run(["git", "commit", "-m", message], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
-        if result.returncode == 0:
-            print("Git commit successful")
-            print(result.stdout)
-        else:
-            print("Git commit failed")
-            print(result.stderr)
-    except Exception as e:
-        print(f"Error during git commit: {e}")
 
 print("Version as tuple:", get_version())
 print("Cleaning '.pio' subfolder...")
@@ -146,6 +175,8 @@ if len(args) > 0:
 else:
 	increment_version()	
       
+
+write_version_hpp()
 
 print("args:", args)
 print("Version after increment:", get_version())
