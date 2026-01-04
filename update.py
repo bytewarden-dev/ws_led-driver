@@ -115,7 +115,6 @@ def git_add():
     try:
         result = subprocess.run(["git", "add", "."], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
         if result.returncode == 0:
-            print("Git add successful")
             print(result.stdout)
         else:
             print("Git add failed")
@@ -127,37 +126,30 @@ def git_commit(message):
     try:
         result = subprocess.run(["git", "commit", "-m", message], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
         if result.returncode == 0:
-            print("Git commit successful")
             print(result.stdout)
         else:
             print("Git commit failed")
             print(result.stderr)
+		
     except Exception as e:
         print(f"Error during git commit: {e}")
 
 def git_fetch():
-    """
-    Wykonuje git fetch.
-    """
     try:
         result = subprocess.run(["git", "fetch"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
         if result.returncode == 0:
-            print("Git fetch successful")
             print(result.stdout)
         else:
-            print("Git fetch failed")
             print(result.stderr)
     except Exception as e:
         print(f"Error during git fetch: {e}")
 
 def git_pull():
     try:
-        result = subprocess.run(["git", "pull", "origin", "main"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+        result = subprocess.run(["git", "pull", "origin", "main-dev"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
         if result.returncode == 0:
-            print("Git pull successful")
             print(result.stdout)
         else:
-            print("Git pull failed")
             print(result.stderr)
     except Exception as e:
         print(f"Error during git pull: {e}")
@@ -165,13 +157,10 @@ def git_pull():
 def git_status():
 	try:
 		result = subprocess.run(["git", "status"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
-		if result.returncode != 0:
-			print("Git status failed")
-			print(result.stderr)
-			return 
-			   
-		print(result.stdout)          
-		return result.returncode
+		if result.returncode == 0:
+			print(result.stdout)
+		else:	
+			print(result.stderr)			
 	except Exception as e:
 		print(f"Error during git status: {e}")
 
@@ -215,7 +204,7 @@ print("Version after increment:", get_version())
 
 
 current_version = get_version()
-commit_message = f"Update version to {'.'.join(str(p) if i < len(current_version)-1 else str(p).zfill(4) for i, p in enumerate(current_version))}"
+commit_message = f"Update version to: v{'.'.join(str(p) if i < len(current_version)-1 else str(p).zfill(4) for i, p in enumerate(current_version))}"
 
 # Step 1: Check Your Working Directory Status
 #           git status
