@@ -104,7 +104,7 @@ def increment_version(type='patch'):
 		new_version[-1] += 1	
             
 	set_version(tuple(new_version))
-	print("Version updated from: {tuple(current_version)}, to version: {tuple(new_version)}")
+	print(F"Version updated from: {tuple(current_version)}, to version: {tuple(new_version)}")
 	  
 
 # git helpers
@@ -187,6 +187,7 @@ def git_push():
 print("Cleaning '.pio' subfolder...")
 
 clean_pio()
+clean_vscode()
 
 print("Version as tuple:", get_version())
 print("Incrementing version...")
