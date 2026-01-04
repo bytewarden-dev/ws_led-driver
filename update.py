@@ -65,22 +65,24 @@ def get_version():
 
 def set_version(new_version):
     if isinstance(new_version, tuple):
-        # Format patch (last part) with 4 digits
         new_version = '.'.join(str(part) if i < len(new_version)-1 else str(part).zfill(4) for i, part in enumerate(new_version))
     with open("VERSION-dev", "w") as version_file:
-        version_file.write(f"v{new_version}\n")
+        version_file.write(f"v{new_version}")
 
 def write_autoversion_h():
     version = get_version()
     hpp_content = f"""#ifndef __AUTOVERSION_H__
 #define __AUTOVERSION_HPP__
 
-
+/// Firmware versioning
 #define FIRMWARE_MAJOR_VERSION {version[0]}
 #define FIRMWARE_MINOR_VERSION {version[1]}
 #define FIRMWARE_PATCH_VERSION {str(version[2]).zfill(4)}
 
+/// Firmware version string
 #define FIRMWARE_VERSION "{version[0]}.{version[1]}.{str(version[2]).zfill(4)}"
+
+
 
 #endif // __AUTOVERSION_H__
 
@@ -146,7 +148,7 @@ def git_fetch():
 
 def git_pull():
     try:
-        result = subprocess.run(["git", "pull", "origin", "main-dev"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+        result = subprocess.run(["git", "pull", "origin", "dev-master"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
         if result.returncode == 0:
             print(result.stdout)
         else:
@@ -166,7 +168,7 @@ def git_status():
 
 def git_push():    
     try:
-        result = subprocess.run(["git", "push"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+        result = subprocess.run(["git", "push", "origin", "dev-master"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
         if result.returncode == 0:
             print("Git push successful")
             print(result.stdout)
