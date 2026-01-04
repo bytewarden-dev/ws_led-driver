@@ -65,6 +65,25 @@ def set_version(new_version):
     with open("VERSION-dev", "w") as version_file:
         version_file.write(f"v{new_version}\n")
 
+def write_autoversion_h():
+    version = get_version()
+    hpp_content = f"""#ifndef __AUTOVERSION_H__
+#define __AUTOVERSION_HPP__
+
+#define FIRMWARE_VMAJOR  {version[0]}
+#define FIRMWARE_MINOR   {version[1]}
+#define FIRMWARE_VPATCH  {version[2]}
+
+#define FIRMWARE_VERSION "{version[0]}.{version[1]}.{str(version[2]).zfill(4)}"
+
+#endif // __AUTOVERSION_H__
+
+"""
+    hpp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "include", "autoversion.h")
+    with open(hpp_path, "w") as hpp_file:
+        hpp_file.write(hpp_content)
+    print(f"Version written to {hpp_path}")
+
 # MAJOR.MINOR.PATCH
 def increment_version(type='patch'):    
 	current_version = get_version()
@@ -126,24 +145,29 @@ def git_fetch():
     except Exception as e:
         print(f"Error during git fetch: {e}")
 
-def write_version_hpp():
-    version = get_version()
-    hpp_content = f"""#ifndef __AUTOVERSION_H__
-#define __AUTOVERSION_HPP__
+def git_pull():
+    try:
+        result = subprocess.run(["git", "pull", "origin", "main"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+        if result.returncode == 0:
+            print("Git pull successful")
+            print(result.stdout)
+        else:
+            print("Git pull failed")
+            print(result.stderr)
+    except Exception as e:
+        print(f"Error during git pull: {e}")
 
-#define FIRMWARE_VMAJOR  {version[0]}
-#define FIRMWARE_MINOR   {version[1]}
-#define FIRMWARE_VPATCH  {version[2]}
-#define FIRMWARE_VERSION "{version[0]}.{version[1]}.{str(version[2]).zfill(4)}"
-
-#endif // __AUTOVERSION_H__
-
-"""
-    hpp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "include", "autoversion.h")
-    with open(hpp_path, "w") as hpp_file:
-        hpp_file.write(hpp_content)
-    print(f"Version written to {hpp_path}")
-
+def git_status():
+	try:
+		result = subprocess.run(["git", "status"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+		if result.returncode == 0:
+			print("Git status successful")
+			print(result.stdout)
+		else:
+			print("Git status failed")
+			print(result.stderr)
+	except Exception as e:
+		print(f"Error during git status: {e}")
 
 def git_push():    
     try:
@@ -176,20 +200,35 @@ else:
 	increment_version()	
       
 
-write_version_hpp()
+write_autoversion_h()
 
 print("args:", args)
 print("Version after increment:", get_version())
-# increment_version()
 
 
-
-git_add()
 
 current_version = get_version()
 commit_message = f"Update version to {'.'.join(str(p) if i < len(current_version)-1 else str(p).zfill(4) for i, p in enumerate(current_version))}"
+
+# Step 1: Check Your Working Directory Status
+#           git status
+git_status()
+
+# Step 2: Stage Your Changes
+#           git add .
+git_add()
+
+# Step 3: Commit Your Changes
+#           git commit -m "Your commit message here"
 git_commit(commit_message)
 
+# Step 4: Pull Latest Changes from the Remote Repository
+#           git pull origin "<branch-name>"
+git_pull()
+
+# Step 5: Resolve Conflicts (If Any)
+# Step 6: Push Your Changes
+#           git push origin "<branch-name>"
 git_push()
 
 
