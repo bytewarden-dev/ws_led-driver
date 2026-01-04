@@ -6,10 +6,13 @@ import subprocess
 
 def del_if(file_path):
 	try:
-		if not os.path.isfile(file_path) or not os.path.islink(file_path): print(f"File {file_path} does not exist.")
-				
-		os.remove(file_path)
+		if not os.path.isfile(file_path) or not os.path.islink(file_path): 
+			print(f"File {file_path} does not exist.")
+			return
+			
+		
 		print(f"Deleted file: {file_path}")		
+		os.remove(file_path)
 	except Exception as e:
 		print(f"Error deleting file {file_path}: {e}")
 		
@@ -162,12 +165,13 @@ def git_pull():
 def git_status():
 	try:
 		result = subprocess.run(["git", "status"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
-		if result.returncode == 0:
-			print("Git status successful")
-			print(result.stdout)
-		else:
+		if result.returncode != 0:
 			print("Git status failed")
 			print(result.stderr)
+			return 
+			   
+		print(result.stdout)          
+		return result.returncode
 	except Exception as e:
 		print(f"Error during git status: {e}")
 
