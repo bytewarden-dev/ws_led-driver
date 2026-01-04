@@ -40,6 +40,8 @@
 # debug information files
 *.dwo
 
+*-dev
+
 # Platform IO
 .pio/build/
 .pio/libdeps/
