@@ -70,9 +70,10 @@ def write_autoversion_h():
     hpp_content = f"""#ifndef __AUTOVERSION_H__
 #define __AUTOVERSION_HPP__
 
-#define FIRMWARE_VMAJOR  {version[0]}
-#define FIRMWARE_MINOR   {version[1]}
-#define FIRMWARE_VPATCH  {version[2]}
+
+#define FIRMWARE_MAJOR_VERSION {version[0]}
+#define FIRMWARE_MINOR_VERSION {version[1]}
+#define FIRMWARE_PATCH_VERSION {str(version[2]).zfill(4)}
 
 #define FIRMWARE_VERSION "{version[0]}.{version[1]}.{str(version[2]).zfill(4)}"
 
