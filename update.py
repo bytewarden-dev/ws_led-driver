@@ -146,7 +146,7 @@ def git_fetch():
 
 def git_pull():
     try:
-        result = subprocess.run(["git", "pull", "origin", "main-dev"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+        result = subprocess.run(["git", "pull", "origin", "dev-master"], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
         if result.returncode == 0:
             print(result.stdout)
         else:
