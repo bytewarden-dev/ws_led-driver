@@ -127,23 +127,23 @@ def git_fetch():
         print(f"Error during git fetch: {e}")
 
 def write_version_hpp():
-    """
-    Zapisuje wersję do pliku include/version.hpp jako stałe C++.
-    """
     version = get_version()
-    hpp_content = f"""#ifndef VERSION_HPP
-#define VERSION_HPP
+    hpp_content = f"""#ifndef __AUTOVERSION_H__
+#define __AUTOVERSION_HPP__
 
-#define VERSION_MAJOR {version[0]}
-#define VERSION_MINOR {version[1]}
-#define VERSION_PATCH {version[2]}
+#define FIRMWARE_VMAJOR  {version[0]}
+#define FIRMWARE_MINOR   {version[1]}
+#define FIRMWARE_VPATCH  {version[2]}
+#define FIRMWARE_VERSION "{version[0]}.{version[1]}.{str(version[2]).zfill(4)}"
 
-#endif // VERSION_HPP
+#endif // __AUTOVERSION_H__
+
 """
-    hpp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "include", "version.hpp")
+    hpp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "include", "autoversion.h")
     with open(hpp_path, "w") as hpp_file:
         hpp_file.write(hpp_content)
     print(f"Version written to {hpp_path}")
+
 
 def git_push():    
     try:

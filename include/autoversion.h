@@ -1,0 +1,10 @@
+#ifndef __AUTOVERSION_H__
+#define __AUTOVERSION_HPP__
+
+#define FIRMWARE_VMAJOR  3
+#define FIRMWARE_MINOR   4
+#define FIRMWARE_VPATCH  3605
+#define FIRMWARE_VERSION "3.4.3605"
+
+#endif // __AUTOVERSION_H__
+
