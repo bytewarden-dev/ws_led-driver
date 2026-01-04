@@ -52,24 +52,40 @@ def clean_pio():
 def get_version():
 	with open("VERSION-dev", "r") as version_file:
 		version = version_file.read().strip()		
-		if version.startswith('v'):					# Usuń 'v' jeśli jest
+		if version.startswith('v'):					
 			version = version[1:]
                
-		parts = version.split('.')					# Podziel na części i konwertuj na inty
+		parts = version.split('.')					
 		return tuple(int(part) for part in parts)
 
 def set_version(new_version):
     if isinstance(new_version, tuple):
-        new_version = '.'.join(str(part) for part in new_version)
+        # Format patch (last part) with 4 digits
+        new_version = '.'.join(str(part) if i < len(new_version)-1 else str(part).zfill(4) for i, part in enumerate(new_version))
     with open("VERSION-dev", "w") as version_file:
         version_file.write(f"v{new_version}\n")
 
-def increment_version():    
-    current_version = get_version()
-    new_version = list(current_version)
-    new_version[-1] += 1  # Zwiększ ostatnią część
-    set_version(tuple(new_version))
-    print(f"Version incremented to: {tuple(new_version)}")
+# MAJOR.MINOR.PATCH
+def increment_version(type='patch'):    
+	current_version = get_version()
+	new_version = list(current_version)
+	if type == 'major': 
+		new_version[0] += 1	
+		new_version[1] = 0
+		new_version[2] = 0
+	elif type == 'minor':
+		new_version[1] += 1
+		new_version[2] = 0
+		new_version[3] = 0
+		new_version[4] = 0
+		new_version[5] = 0
+	else:  # 'patch' or default
+		new_version[-1] += 1	
+            
+	set_version(tuple(new_version))
+	print("Version updated from:", current_version)
+	print(" to version: ", tuple(new_version))	
+	  
 
 def git_push():    
     try:
@@ -98,17 +114,50 @@ def git_add():
     except Exception as e:
         print(f"Error during git add: {e}")
 
+def git_commit(message):
+    """
+    Wykonuje git commit z podaną wiadomością.
+    """
+    try:
+        result = subprocess.run(["git", "commit", "-m", message], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+        if result.returncode == 0:
+            print("Git commit successful")
+            print(result.stdout)
+        else:
+            print("Git commit failed")
+            print(result.stderr)
+    except Exception as e:
+        print(f"Error during git commit: {e}")
+
 print("Version as tuple:", get_version())
 print("Cleaning '.pio' subfolder...")
 
-
-
-increment_version()
-
-
 clean_pio()
 
+print("Incrementing version...")
+
+args = sys.argv[1:]
+if len(args) > 0:
+	m_type = args[0].lower()
+	if m_type in ['major', 'minor', 'patch']:
+		increment_version(type=m_type)
+	else:
+		print("Unknown version increment type. Use 'major', 'minor', or 'patch'. Defaulting to 'patch'.")	
+else:
+	increment_version()	
+      
+
+print("args:", args)
+print("Version after increment:", get_version())
+# increment_version()
+
+
+
 git_add()
+
+current_version = get_version()
+commit_message = f"Update version to {'.'.join(str(p) if i < len(current_version)-1 else str(p).zfill(4) for i, p in enumerate(current_version))}"
+git_commit(commit_message)
 
 git_push()
 
