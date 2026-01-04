@@ -6,8 +6,10 @@ import subprocess
 
 def del_if(file_path):
 	try:
-		if os.path.isfile(file_path) or os.path.islink(file_path):
-			os.remove(file_path)
+		if not os.path.isfile(file_path) or not os.path.islink(file_path): print(f"File {file_path} does not exist.")
+				
+		os.remove(file_path)
+		print(f"Deleted file: {file_path}")		
 	except Exception as e:
 		print(f"Error deleting file {file_path}: {e}")
 		
@@ -33,22 +35,22 @@ def mkdir_if(folder_path):
 		os.makedirs(folder_path)
 
 def clean_pio():
-    bpath = os.path.dirname(os.path.abspath(__file__))
-
-    pio_path = os.path.join(bpath, ".pio")
+    pio_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".pio")
     pio_build_path = os.path.join(pio_path, "build")
     pio_libdeps_path = os.path.join(pio_path, "libdeps")
     rmdir_if(pio_build_path)      
-    rmdir_if(pio_libdeps_path)     
-    mkdir_if(pio_build_path)
-    mkdir_if(pio_libdeps_path)
+    rmdir_if(pio_libdeps_path)
          
-    vscode = os.path.join(bpath, ".vscode")
-    del_if(vscode+"\\c_cpp_properties.json")
-    del_if(vscode+"\\launch.json")
+    mkdir_if(pio_build_path)
+    mkdir_if(pio_libdeps_path)         
+	
+def clean_vscode():
+	vscode = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".vscode")
+	del_if(vscode+"\\c_cpp_properties.json")
+	del_if(vscode+"\\launch.json")	
 
 
-
+# MAJOR.MINOR.PATCH
 def get_version():
 	with open("VERSION-dev", "r") as version_file:
 		version = version_file.read().strip()		
@@ -85,7 +87,6 @@ def write_autoversion_h():
         hpp_file.write(hpp_content)
     print(f"Version written to {hpp_path}")
 
-# MAJOR.MINOR.PATCH
 def increment_version(type='patch'):    
 	current_version = get_version()
 	new_version = list(current_version)
@@ -106,7 +107,7 @@ def increment_version(type='patch'):
 	print("Version updated from: {tuple(current_version)}, to version: {tuple(new_version)}")
 	  
 
-
+# git helpers
 def git_add():
     try:
         result = subprocess.run(["git", "add", "."], capture_output=True, text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
@@ -183,11 +184,11 @@ def git_push():
         print(f"Error during git push: {e}")
 
 
-print("Version as tuple:", get_version())
 print("Cleaning '.pio' subfolder...")
 
 clean_pio()
 
+print("Version as tuple:", get_version())
 print("Incrementing version...")
 
 args = sys.argv[1:]
