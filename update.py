@@ -4,6 +4,9 @@ import shutil
 import subprocess
 
 
+v_file = "VERSION"
+
+
 def del_if(file_path):
 	try:
 		if not os.path.isfile(file_path) or not os.path.islink(file_path): 
@@ -52,10 +55,9 @@ def clean_vscode():
 	del_if(vscode+"\\c_cpp_properties.json")
 	del_if(vscode+"\\launch.json")	
 
-
 # MAJOR.MINOR.PATCH
 def get_version():
-	with open("VERSION-dev", "r") as version_file:
+	with open(v_file, "r") as version_file:
 		version = version_file.read().strip()		
 		if version.startswith('v'):					
 			version = version[1:]
@@ -66,7 +68,7 @@ def get_version():
 def set_version(new_version):
     if isinstance(new_version, tuple):
         new_version = '.'.join(str(part) if i < len(new_version)-1 else str(part).zfill(4) for i, part in enumerate(new_version))
-    with open("VERSION-dev", "w") as version_file:
+    with open(v_file, "w") as version_file:
         version_file.write(f"v{new_version}")
 
 def write_autoversion_h():

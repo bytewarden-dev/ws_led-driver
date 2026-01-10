@@ -1,7 +1,6 @@
 #include <stdafx.h>
 
 
-// v3.0.2991
 void setup()
 {
 	Wire.begin();  				// Start I2C as master
